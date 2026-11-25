@@ -1,11 +1,8 @@
 import ReportForm from "../features/reports/components/ReportForm";
-import type { ServiceReport } from "../features/reports/types";
+
+import { createReport } from "../services/api";
 
 function ReportFormPage() {
-  const handleReportSubmit = (report: ServiceReport) => {
-    console.log("Submitted service report:", report);
-  };
-
   return (
     <section className="space-y-6">
       {/* Page Heading */}
@@ -18,7 +15,7 @@ function ReportFormPage() {
       </div>
 
       {/* Report Submission Form */}
-      <ReportForm onSubmit={handleReportSubmit} />
+      <ReportForm onSubmit={createReport} />
     </section>
   );
 }

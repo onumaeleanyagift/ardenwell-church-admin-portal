@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
@@ -12,12 +13,14 @@ import { serviceTypeOptions } from "../../../data/serviceTypes";
 import { validateReportForm } from "../validation";
 import type { ReportFormErrors } from "../validation";
 
-import { determineInitialStatus } from "../triage";
-
-import type { ReportFormValues, ServiceReport } from "../types";
+import type {
+  CreateReportPayload,
+  ReportFormValues,
+  ServiceReport,
+} from "../types";
 
 interface ReportFormProps {
-  onSubmit: (report: ServiceReport) => void;
+  onSubmit: (payload: CreateReportPayload) => Promise<ServiceReport>;
 }
 
 const initialFormValues: ReportFormValues = {
@@ -37,6 +40,9 @@ function ReportForm({ onSubmit }: ReportFormProps) {
     useState<ReportFormValues>(initialFormValues);
 
   const [errors, setErrors] = useState<ReportFormErrors>({});
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -68,49 +74,53 @@ function ReportForm({ onSubmit }: ReportFormProps) {
     setFormValues(initialFormValues);
     setErrors({});
     setSuccessMessage("");
+    setSubmitError("");
   };
 
   // Handle report submission.
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const validationErrors = validateReportForm(formValues);
 
     setErrors(validationErrors);
+    setSubmitError("");
+    setSuccessMessage("");
 
     if (Object.keys(validationErrors).length > 0) {
-      setSuccessMessage("");
       return;
     }
 
-    const attendanceCount = Number(formValues.attendanceCount);
-
-    const firstTimersCount = Number(formValues.firstTimersCount);
-
-    const initialStatus = determineInitialStatus({
-      attendanceCount,
-      hasUrgentNeeds: formValues.hasUrgentNeeds,
-    });
-
-    const newReport: ServiceReport = {
-      id: crypto.randomUUID(),
+    const payload: CreateReportPayload = {
       branchName: formValues.branchName,
       serviceType: formValues.serviceType,
       serviceDate: formValues.serviceDate,
-      attendanceCount,
-      firstTimersCount,
+      attendanceCount: Number(formValues.attendanceCount),
+      firstTimersCount: Number(formValues.firstTimersCount),
       notes: formValues.notes.trim(),
       hasUrgentNeeds: formValues.hasUrgentNeeds,
-      initialStatus,
-      status: initialStatus,
-      submittedAt: new Date().toISOString(),
     };
 
-    onSubmit(newReport);
+    try {
+      setIsSubmitting(true);
 
-    handleReset();
+      const savedReport = await onSubmit(payload);
 
-    setSuccessMessage("Service report submitted successfully.");
+      handleReset();
+
+      setSuccessMessage(
+        `Report submitted successfully. Initial status: ${savedReport.initialStatus}.`,
+      );
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to submit report. Please try again.";
+
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -253,6 +263,15 @@ function ReportForm({ onSubmit }: ReportFormProps) {
         </div>
 
         {/* Success Message */}
+        {submitError && (
+          <div
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          >
+            {submitError}
+          </div>
+        )}
+
         {successMessage && (
           <div
             role="status"
@@ -264,11 +283,18 @@ function ReportForm({ onSubmit }: ReportFormProps) {
 
         {/* Form Actions */}
         <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={handleReset}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            disabled={isSubmitting}
+          >
             Reset Form
           </Button>
 
-          <Button type="submit">Submit Report</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Report"}
+          </Button>
         </div>
       </form>
     </Card>

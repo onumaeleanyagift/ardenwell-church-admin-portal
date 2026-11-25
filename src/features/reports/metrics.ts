@@ -1,4 +1,5 @@
 import type { ServiceReport } from "./types";
+import { branchOptions } from "../../data/branches";
 
 export interface ReportMetrics {
   totalAttendance: number;
@@ -40,4 +41,25 @@ export function calculateReportMetrics(
       needsFollowUpReports: 0,
     },
   );
+}
+
+export function calculateBranchAttendance(reports: ServiceReport[]) {
+  const attendanceByBranch = reports.reduce<Record<string, number>>(
+    (totals, report) => {
+      totals[report.branchName] =
+        (totals[report.branchName] ?? 0) + report.attendanceCount;
+
+      return totals;
+    },
+    {},
+  );
+
+  return Object.entries(attendanceByBranch)
+    .map(([branchValue, attendance]) => ({
+      branchName:
+        branchOptions.find((branch) => branch.value === branchValue)?.label ??
+        branchValue,
+      attendance,
+    }))
+    .sort((a, b) => b.attendance - a.attendance);
 }

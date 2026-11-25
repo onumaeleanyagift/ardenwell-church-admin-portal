@@ -23,3 +23,13 @@ export interface ServiceReport {
   submittedAt: string;
   hasUrgentNeeds: boolean;
 }
+
+export interface CreateReportPayload {
+  branchName: string;
+  serviceType: string;
+  serviceDate: string;
+  attendanceCount: number;
+  firstTimersCount: number;
+  notes: string;
+  hasUrgentNeeds: boolean;
+}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import ReportFormPage from "./pages/ReportFormPage";
+import ReportsPage from "./pages/ReportsPage";
 
 import type { SidebarPage } from "./components/layout/Sidebar";
 
@@ -31,17 +32,7 @@ function App() {
         return <ReportFormPage />;
 
       case "reports":
-        return (
-          <div>
-            <h1 className="text-2xl font-bold text-brand-950">
-              Branch Reports
-            </h1>
-
-            <p className="mt-1 text-sm text-slate-500">
-              View and manage submitted branch reports.
-            </p>
-          </div>
-        );
+        return <ReportsPage />;
 
       default:
         return null;
