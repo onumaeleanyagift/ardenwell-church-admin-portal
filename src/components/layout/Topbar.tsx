@@ -10,7 +10,7 @@ function Topbar({
   avatarInitials = "HQ",
 }: TopbarProps) {
   return (
-    <header className="flex h-20 items-center justify-end border-b border-slate-200 bg-white px-6">
+    <header className="flex h-23 items-center justify-end border-b border-slate-200 bg-white px-6">
       <div className="flex items-center gap-5">
         {/* Notification */}
         <div className="relative">
