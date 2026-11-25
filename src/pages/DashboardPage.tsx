@@ -1,17 +1,65 @@
+import { useEffect, useState } from "react";
+
+import Button from "../components/ui/Button";
 import MetricCard from "../components/ui/MetricCard";
 
 import ReportStatusSummary from "../features/reports/components/ReportStatusSummary";
 import BranchAttendanceSummary from "../features/reports/components/BranchAttendanceSummary";
 
+import {
+  calculateReportMetrics,
+  calculateBranchAttendance,
+} from "../features/reports/metrics";
+
+import { getReports } from "../services/api";
+import type { ServiceReport } from "../features/reports/types";
+
 function DashboardPage() {
-  // Temporary data for the dashboard preview.
-  // We will replace this with actual report data later.
-  const branchAttendance = [
-    { branchName: "Ikeja", attendance: 920 },
-    { branchName: "Lekki", attendance: 740 },
-    { branchName: "Abuja", attendance: 624 },
-    { branchName: "Ajah", attendance: 500 },
-  ];
+  const [reports, setReports] = useState<ServiceReport[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
+  // Retrieve reports from the backend.
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadReports() {
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const data = await getReports();
+
+        if (isActive) {
+          setReports(data);
+        }
+      } catch (error: unknown) {
+        if (isActive) {
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load dashboard data.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadReports();
+
+    return () => {
+      isActive = false;
+    };
+  }, [reloadKey]);
+
+  // Calculate dashboard metrics from retrieved reports.
+  const metrics = calculateReportMetrics(reports);
+
+  const branchAttendance = calculateBranchAttendance(reports);
 
   return (
     <section className="space-y-6">
@@ -24,47 +72,76 @@ function DashboardPage() {
         </p>
       </div>
 
-      {/* Summary Metrics */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          title="Total Attendance"
-          value="2,784"
-          description="Across all branches"
-          accent="blue"
-        />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
+          <p className="text-sm text-slate-500">Loading dashboard data...</p>
+        </div>
+      )}
 
-        <MetricCard
-          title="Total First-Timers"
-          value="146"
-          description="Across all branches"
-          accent="green"
-        />
+      {/* Error State */}
+      {!isLoading && error && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-5"
+        >
+          <p className="text-sm text-red-700">{error}</p>
 
-        <MetricCard
-          title="Reports Submitted"
-          value="24"
-          description="Total submitted reports"
-          accent="amber"
-        />
+          <Button
+            variant="outline"
+            className="mt-3"
+            onClick={() => setReloadKey((current) => current + 1)}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
 
-        <MetricCard
-          title="Pending Review"
-          value="6"
-          description="Awaiting headquarters review"
-          accent="indigo"
-        />
-      </div>
+      {/* Dashboard Metrics */}
+      {!isLoading && !error && (
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <MetricCard
+              title="Total Attendance"
+              value={metrics.totalAttendance.toLocaleString()}
+              description="Across all branches"
+              accent="blue"
+            />
 
-      {/* Dashboard Analytics */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <ReportStatusSummary
-          approved={14}
-          pendingReview={6}
-          needsFollowUp={4}
-        />
+            <MetricCard
+              title="Total First-Timers"
+              value={metrics.totalFirstTimers.toLocaleString()}
+              description="Across all branches"
+              accent="green"
+            />
 
-        <BranchAttendanceSummary branches={branchAttendance} />
-      </div>
+            <MetricCard
+              title="Reports Submitted"
+              value={metrics.totalReports}
+              description="Total submitted reports"
+              accent="amber"
+            />
+
+            <MetricCard
+              title="Pending Review"
+              value={metrics.pendingReviewReports}
+              description="Awaiting headquarters review"
+              accent="indigo"
+            />
+          </div>
+
+          {/* Dashboard Analytics */}
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <ReportStatusSummary
+              approved={metrics.approvedReports}
+              pendingReview={metrics.pendingReviewReports}
+              needsFollowUp={metrics.needsFollowUpReports}
+            />
+
+            <BranchAttendanceSummary branches={branchAttendance} />
+          </div>
+        </>
+      )}
     </section>
   );
 }
