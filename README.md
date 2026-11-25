@@ -242,13 +242,13 @@ Git ignores this file, so it does not form part of the repository. Each local in
 ## Screenshots
 
 ### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
+![Dashboard](docs/screenshots/dashboard.jpeg)
 
 ### New Report Form
-![New Report Form](docs/screenshots/new-report-form.png)
+![New Report Form](docs/screenshots/new-report-form.jpeg)
 
 ### Reports Page
-![Reports Page](docs/screenshots/reports-page.png)
+![Reports Page](docs/screenshots/reports-page.jpeg)
 
 ## Current Limitations
 
