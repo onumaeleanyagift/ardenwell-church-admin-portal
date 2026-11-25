@@ -16,16 +16,12 @@ from triage import determine_initial_status
 
 app = Flask(__name__)
 
-FRONTEND_ORIGINS = [
-    "http://localhost:5173",
-    "https://ardenwellchurchhq.vercel.app/",
-]
 
 CORS(
     app,
     resources={
         r"/api/*": {
-            "origins": FRONTEND_ORIGINS
+            "origins": "http://localhost:5173"
         }
     }
 )
