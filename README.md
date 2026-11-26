@@ -1,14 +1,14 @@
 # Ardenwell Church Administration Portal
 
-A web application for managing service reports across multiple church branches. It helps branches submit reports and gives headquarters one place to review attendance, track first-timers, and manage submitted reports.
+A web application for managing service reports across multiple church branches. It allows branches to submit service reports and gives headquarters one place to monitor attendance, track first-timers, and manage submitted reports.
 
 ## About the Project
 
 I built this application to make branch reporting easier to manage.
 
-Each branch can submit its service details, including attendance, first-timers, notes, and urgent needs. The backend checks the submitted information and assigns an initial status.
+Each branch can submit its service details, including attendance, first-timers, notes, and urgent needs. The backend validates the submitted information and assigns an initial status.
 
-Headquarters can view all submitted reports, filter them by branch or status, and approve or flag reports that are still pending review.
+Headquarters can view report summaries on the dashboard and manage submitted reports from the Reports page. The Reports page also supports branch and status filters, pagination, and report approval or follow-up actions.
 
 ## What the Application Does
 
@@ -16,8 +16,10 @@ Headquarters can view all submitted reports, filter them by branch or status, an
 - Checks submitted information on the frontend and backend.
 - Assigns an initial status to each report.
 - Shows total attendance and first-timer figures on the dashboard.
-- Displays reports from different branches.
+- Displays the five most recent reports on the dashboard.
+- Displays all submitted reports on the Reports page.
 - Filters reports by branch and status.
+- Uses pagination to display reports in groups of 10.
 - Allows headquarters to approve or flag pending reports.
 - Stores submitted reports in an SQLite database.
 
@@ -48,8 +50,12 @@ ardenwell-church-admin-portal/
 ├── src/
 │   ├── components/
 │   ├── data/
-│   ├── features/
-│   │   └── reports/
+│   │  features/
+│   ├── reports/
+│   │   ├── components/
+│   │   ├── metrics.ts
+│   │   ├── types.ts
+│   │   └── validation.ts
 │   ├── pages/
 │   ├── services/
 │   ├── App.tsx
@@ -199,6 +205,10 @@ The seven tests cover:
 5. Approving a pending report.
 6. Flagging a pending report.
 7. Preventing another status update after a report has already been decided.
+9. Open the Reports page to view all submitted reports.
+10. Use the branch and status filters to narrow down the results.
+11. Use Previous and Next to navigate through reports. Each page displays up to 10 reports.
+12. Use the headquarters actions to approve or flag pending reports.
 
 Return to the project root:
 
