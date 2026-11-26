@@ -4,14 +4,16 @@ import ReportStatusBadge from "./ReportStatusBadge";
 
 import { branchOptions } from "../../../data/branches";
 import { serviceTypeOptions } from "../../../data/serviceTypes";
-import type { ReportAction } from "../../../services/api";
 
+import type { ReportAction } from "../../../services/api";
 import type { ServiceReport } from "../types";
 
 interface ReportsTableProps {
   reports: ServiceReport[];
-  onStatusUpdate: (reportId: string, action: ReportAction) => void;
+  onStatusUpdate?: (reportId: string, action: ReportAction) => void;
   updatingReportId?: string | null;
+  title?: string;
+  showActions?: boolean;
 }
 
 function formatDate(dateValue: string): string {
@@ -59,14 +61,14 @@ function ReportsTable({
   reports,
   onStatusUpdate,
   updatingReportId,
+  title = "Branch Service Reports",
+  showActions = true,
 }: ReportsTableProps) {
   return (
     <Card className="overflow-hidden !p-0">
       {/* Table Header */}
       <div className="border-b border-slate-100 px-5 py-4">
-        <h2 className="text-base font-semibold text-brand-950">
-          Branch Service Reports
-        </h2>
+        <h2 className="text-base font-semibold text-brand-950">{title}</h2>
 
         <p className="mt-1 text-xs text-slate-500">
           View submitted service and activity reports.
@@ -106,9 +108,11 @@ function ReportsTable({
                 Submitted At
               </th>
 
-              <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Actions
-              </th>
+              {showActions && (
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
 
@@ -147,40 +151,45 @@ function ReportsTable({
                     {formatDateTime(report.submittedAt)}
                   </td>
 
-                  <td className="px-5 py-4">
-                    {report.status === "Pending Review" ? (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="primary"
-                          className="px-3 py-1.5 text-xs"
-                          disabled={updatingReportId === report.id}
-                          onClick={() => onStatusUpdate(report.id, "approve")}
-                        >
-                          {updatingReportId === report.id
-                            ? "Updating..."
-                            : "Approve"}
-                        </Button>
+                  {showActions && (
+                    <td className="px-5 py-4">
+                      {report.status === "Pending Review" && onStatusUpdate ? (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="primary"
+                            className="px-3 py-1.5 text-xs"
+                            disabled={updatingReportId === report.id}
+                            onClick={() => onStatusUpdate(report.id, "approve")}
+                          >
+                            {updatingReportId === report.id
+                              ? "Updating..."
+                              : "Approve"}
+                          </Button>
 
-                        <Button
-                          variant="danger"
-                          className="px-3 py-1.5 text-xs"
-                          disabled={updatingReportId === report.id}
-                          onClick={() => onStatusUpdate(report.id, "flag")}
-                        >
-                          Flag
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-400">
-                        No actions available
-                      </span>
-                    )}
-                  </td>
+                          <Button
+                            variant="danger"
+                            className="px-3 py-1.5 text-xs"
+                            disabled={updatingReportId === report.id}
+                            onClick={() => onStatusUpdate(report.id, "flag")}
+                          >
+                            Flag
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">
+                          No actions available
+                        </span>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-5 py-12 text-center">
+                <td
+                  colSpan={showActions ? 8 : 7}
+                  className="px-5 py-12 text-center"
+                >
                   <p className="text-sm font-medium text-slate-600">
                     No reports found
                   </p>

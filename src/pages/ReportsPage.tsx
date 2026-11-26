@@ -11,6 +11,8 @@ import type { ReportAction } from "../services/api";
 
 import type { ReportStatus, ServiceReport } from "../features/reports/types";
 
+const REPORTS_PER_PAGE = 10;
+
 function ReportsPage() {
   // Reports retrieved from the backend.
   const [reports, setReports] = useState<ServiceReport[]>([]);
@@ -30,6 +32,8 @@ function ReportsPage() {
 
   const [actionError, setActionError] = useState("");
   const [actionSuccess, setActionSuccess] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Retrieve reports from Flask.
   useEffect(() => {
@@ -77,10 +81,43 @@ function ReportsPage() {
     return matchesBranch && matchesStatus;
   });
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredReports.length / REPORTS_PER_PAGE),
+  );
+
+  // Keep the current page within the available page range.
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const startIndex = (safeCurrentPage - 1) * REPORTS_PER_PAGE;
+
+  const paginatedReports = filteredReports.slice(
+    startIndex,
+    startIndex + REPORTS_PER_PAGE,
+  );
+
+  const firstReport = filteredReports.length === 0 ? 0 : startIndex + 1;
+
+  const lastReport = Math.min(
+    startIndex + REPORTS_PER_PAGE,
+    filteredReports.length,
+  );
+
+  const handleBranchChange = (branch: string) => {
+    setSelectedBranch(branch);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (status: ReportStatus | "") => {
+    setSelectedStatus(status);
+    setCurrentPage(1);
+  };
+
   // Reset both filters.
   const handleClearFilters = () => {
     setSelectedBranch("");
     setSelectedStatus("");
+    setCurrentPage(1);
   };
 
   const handleStatusUpdate = async (reportId: string, action: ReportAction) => {
@@ -129,8 +166,8 @@ function ReportsPage() {
       <ReportFilters
         selectedBranch={selectedBranch}
         selectedStatus={selectedStatus}
-        onBranchChange={setSelectedBranch}
-        onStatusChange={setSelectedStatus}
+        onBranchChange={handleBranchChange}
+        onStatusChange={handleStatusChange}
         onClearFilters={handleClearFilters}
       />
 
@@ -180,11 +217,41 @@ function ReportsPage() {
       {/* Reports Table */}
       {!isLoading && !error && (
         <ReportsTable
-          reports={filteredReports}
+          reports={paginatedReports}
           onStatusUpdate={handleStatusUpdate}
           updatingReportId={updatingReportId}
         />
       )}
+
+      {/* Pagination */}
+      <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-slate-500">
+          Showing {firstReport} to {lastReport} of {filteredReports.length}{" "}
+          reports
+        </p>
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            disabled={safeCurrentPage === 1}
+            onClick={() => setCurrentPage((page) => page - 1)}
+          >
+            Previous
+          </Button>
+
+          <span className="text-sm font-medium text-slate-700">
+            Page {safeCurrentPage} of {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            disabled={safeCurrentPage === totalPages}
+            onClick={() => setCurrentPage((page) => page + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </section>
   );
 }
