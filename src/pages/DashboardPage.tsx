@@ -5,6 +5,7 @@ import MetricCard from "../components/ui/MetricCard";
 
 import ReportStatusSummary from "../features/reports/components/ReportStatusSummary";
 import BranchAttendanceSummary from "../features/reports/components/BranchAttendanceSummary";
+import ReportsTable from "../features/reports/components/ReportsTable";
 
 import {
   calculateReportMetrics,
@@ -61,6 +62,9 @@ function DashboardPage() {
 
   const branchAttendance = calculateBranchAttendance(reports);
 
+  // Display the five most recent reports.
+  const recentReports = reports.slice(0, 5);
+
   return (
     <section className="space-y-6">
       {/* Page Heading */}
@@ -97,9 +101,10 @@ function DashboardPage() {
         </div>
       )}
 
-      {/* Dashboard Metrics */}
+      {/* Dashboard Content */}
       {!isLoading && !error && (
         <>
+          {/* Dashboard Metrics */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               title="Total Attendance"
@@ -140,6 +145,13 @@ function DashboardPage() {
 
             <BranchAttendanceSummary branches={branchAttendance} />
           </div>
+
+          {/* Recent Branch Reports */}
+          <ReportsTable
+            title="Recent Branch Reports"
+            reports={recentReports}
+            showActions={false}
+          />
         </>
       )}
     </section>

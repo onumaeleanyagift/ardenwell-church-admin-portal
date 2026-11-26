@@ -204,7 +204,7 @@ def update_report_status_route(report_id):
 
     action = data.get("action")
 
-    if action not in status_by_action:
+    if not isinstance(action, str) or action not in status_by_action:
         return jsonify({
             "message": "Action must be either approve or flag."
         }), 400

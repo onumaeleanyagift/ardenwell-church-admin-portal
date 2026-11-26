@@ -2,41 +2,41 @@
 
 ## 1. AI Tools Used
 
-I used ChatGPT as a development assistant while working on the Ardenwell Church Administration Portal.
+I used ChatGPT as a development assistant while building the Ardenwell Church Administration Portal.
 
 I used it to:
 
-- Discuss the project structure and how to separate the frontend and backend.
+- Plan the project structure and separate the frontend from the backend.
 - Work through React and TypeScript components.
-- Understand how to connect the frontend to the Flask API.
-- Review validation and report status logic.
-- Help write and understand backend tests.
+- Connect the React frontend to the Flask API.
+- Review form validation and report status rules.
+- Implement pagination and improve input validation.
+- Understand and write backend tests.
 - Troubleshoot errors during development.
-- Review commands and explain what they do before I ran them.
+- Understand commands and review suggested code before running them.
 
-I used AI to support my work, but I still reviewed the code, ran the commands, checked the results, and tested the application myself.
+I used ChatGPT to support the development process, but I reviewed the suggestions, ran the code, and tested the application myself.
 
-## 2. Parts of the Project Where I Used AI
-
-I used ChatGPT at different stages of development.
+## 2. Areas Where I Used AI
 
 | Project Area | How I Used AI |
 |---|---|
-| Project setup | Helped me understand the setup process and dependencies. |
-| Frontend | Assisted with reusable components, page structure, and TypeScript implementation. |
-| Backend | Helped with Flask routes, request validation, and SQLite integration. |
-| Report triage | Helped implement and review the rules for assigning report statuses. |
-| Testing | Helped structure test cases for report submission and status updates. |
-| Troubleshooting | Helped investigate errors and understand their causes. |
-| Documentation | Assisted with preparing the project plan and setup instructions. |
+| Project setup | Discussed the project structure, dependencies, and development environment. |
+| Frontend | Worked through reusable components, page layouts, and TypeScript implementation. |
+| Backend | Worked through Flask routes, request validation, and SQLite integration. |
+| Report triage | Reviewed the rules for assigning initial report statuses. |
+| Testing | Developed test cases for report submission, validation, and status updates. |
+| Pagination | Implemented report pagination and handled filter changes. |
+| Troubleshooting | Investigated errors and checked possible fixes. |
+| Documentation | Prepared the project plan, AI usage documentation, and README instructions. |
 
 ## 3. Example of AI-Generated Code That Needed Fixing
 
 During backend development, I encountered a problem with the report triage function.
 
-The application already had a `determine_initial_status()` function in `triage.py`. However, another function with the same name appeared in `app.py`.
+One of the AI-generated suggestions introduced another `determine_initial_status()` function in `app.py`, even though I had already imported that function from `triage.py`.
 
-The duplicate function took different arguments and did not support the `service_type` argument used when creating a report.
+The new function had a different set of arguments and did not accept the `service_type` argument used when submitting a report. Its definition also replaced the imported function in the module.
 
 When I ran the backend tests, some tests failed with this error:
 
@@ -44,30 +44,28 @@ When I ran the backend tests, some tests failed with this error:
 TypeError: determine_initial_status() got an unexpected keyword argument 'service_type'
 ```
 
-This showed that the application was calling a function that did not accept the arguments being passed to it.
-
 ## 4. How I Found and Fixed It
 
-I checked the function definition and compared it with the arguments used in the report submission route.
+I checked the error message and compared the function definition with the arguments passed from the report submission route.
 
-I also inspected the function signature to confirm which version of the function the application was using.
+I also inspected the function signature to confirm which version the application was calling.
 
 I found that the duplicate function in `app.py` was overriding the imported function from `triage.py`.
 
-I removed the duplicate function and its outdated threshold definition. The application then used the central triage function in `triage.py`.
+I removed the duplicate function and its outdated threshold definition. This left `triage.py` as the single source of truth for the report status rules.
 
-After making the change, I ran the tests again. All seven backend tests passed.
+After the change, I ran the backend tests again. All seven tests passed.
 
-This helped me understand why keeping one source of truth for business rules matters. It also showed me why I should test AI-generated code instead of assuming it will work as expected.
+This experience helped me understand why keeping business rules in one place matters. It also reminded me to check AI-generated code carefully instead of assuming that a suggested implementation will work.
 
 ## 5. How I Checked AI-Generated Code
 
-I followed a simple process when working with AI-generated code:
+I followed a few steps when working with AI-generated code:
 
 1. I reviewed the suggested code before adding it to the project.
 2. I asked questions when I did not understand a command or implementation.
-3. I ran the application and checked how the changes behaved.
-4. I used tests to check important backend operations and validation rules.
-5. When an error occurred, I checked the code and error message before applying a fix.
+3. I ran the application to check how the changes behaved.
+4. I used tests to check important backend operations and input validation.
+5. When an error occurred, I checked the error message and traced it back to the relevant code before applying a fix.
 
-AI helped me move through the development process, but I remained responsible for understanding and testing the code in the project.
+ChatGPT helped me work through the project, but I remained responsible for understanding, reviewing, and testing the code I submitted.

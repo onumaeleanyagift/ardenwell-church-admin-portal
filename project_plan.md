@@ -93,9 +93,9 @@ These thresholds are project assumptions for the MVP. They can change when the c
 
 ### Dashboard and Report Management
 
-The dashboard displays attendance totals, first-timer totals, report counts, and report status summaries.
+The dashboard displays attendance totals, first-timer totals, report counts, and report status summaries. It also shows the five most recent branch reports.
 
-The reports page displays submitted reports and allows users to filter by branch or status.
+The reports page displays all submitted reports. I added filters for branch and status, as well as pagination to make it easier to navigate through reports. Each page displays up to 10 reports.
 
 Headquarters can approve or flag reports that are still pending review. The backend prevents users from changing a report that already has a final status.
 
@@ -118,12 +118,12 @@ I divided the work into these main stages:
 2. Frontend development: Built the dashboard layout, reusable UI components, report form, and reports page.
 3. Backend development: Added the Flask API, report validation, status rules, and SQLite storage.
 4. Frontend and backend connection: Connected the React interface to the API and tested report submission and retrieval.
-5. Report management: Added filtering and the headquarters actions for approving or flagging pending reports.
+5. Report management: Report management: Added branch and status filters, pagination, and headquarters actions for approving or flagging pending reports.
 6. Testing and documentation: Tested the main report workflows and prepared the project documentation.
 
 ### Estimated Time Allocation
 
-The assessment gives an estimated working period of four to six hours. I used the following breakdown as a guide:
+I planned the work around the assessment's 4–6 hour window. The breakdown below shows how I estimated the time needed for each stage of the MVP.
 
 | Task | Estimated Time |
 |---|---:|
@@ -133,7 +133,7 @@ The assessment gives an estimated working period of four to six hours. I used th
 | Backend and SQLite integration | 75 minutes |
 | Dashboard data and report management | 60 minutes |
 | Testing and documentation | 40 minutes |
-| Total | 5 hours 20 minutes |
+| Total | 5 hours 40 minutes |
 
 ## 7. Assumptions and Trade-offs
 
@@ -147,7 +147,7 @@ I made a few decisions to keep the project within the assessment scope.
 
 ## 8. Testing and Quality Checks
 
-I used Python's `unit-test` framework to test the backend.
+I used Python's `unittest` framework to test the backend.
 
 The tests cover:
 
